@@ -8,7 +8,7 @@ const joinPath = path => {
   return root + '/' + path
 }
 
-const getConfig = path => {
+const getConfigPath = path => {
   const config_path = joinPath('config') + '/' + path
   return config_path
 }
@@ -16,5 +16,5 @@ const getConfig = path => {
 module.exports = {
   getRoot,
   joinPath,
-  getConfig
+  getConfigPath
 }
