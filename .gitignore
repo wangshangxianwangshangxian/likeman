@@ -1,0 +1,10 @@
+*.log
+log/
+node_modules
+encrypted_data.txt
+config/wallet.xlsx
+config
+dist
+config/config.ini
+dist.zip
+main.exe
