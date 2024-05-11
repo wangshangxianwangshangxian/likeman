@@ -1,7 +1,8 @@
 const fs = require('fs')
 const ini = require('ini')
-const { getConfigPath } = require('./pathLoad')
+const { getConfigPath, joinPath } = require('./pathLoad')
 const { decrypt } = require('./encrypt')
+const XLSX = require('xlsx')
 
 const getTime = (time_stamp = Date.now(), format = 'YYYY-MM-DD hh:mm:ss') => {
   const d = new Date(time_stamp)
@@ -61,6 +62,46 @@ const getConfig = () => {
   return config
 }
 
+const getXLSX = () => {
+  const wallet_xlsx_path = joinPath('config/wallet.xlsx')
+  const workbook = XLSX.readFile(wallet_xlsx_path)
+  return workbook
+}
+const getConfigConfig = () => {
+  const workbook = getXLSX().Sheets
+  const config = {
+    thread: workbook.config['B2'].v,
+    thread_sleep_from: workbook.config['B3'].v,
+    thread_sleep_to: workbook.config['B4'].v,
+    task_sleep_from: workbook.config['B5'].v,
+    task_sleep_to: workbook.config['B6'].v,
+    mode: workbook.config['B7'].v
+  }
+  return config
+}
+const configconfig = getConfigConfig()
+
+const getConfigTasks = () => {
+  const workbook = getXLSX().Sheets
+  const tasks = []
+  const config_tasks = XLSX.utils.sheet_to_json(workbook.tasks)
+  for (let i = 1; i < config_tasks.length; i++) {
+    const t = config_tasks[i]
+    if (!t.add)
+      continue
+    tasks.push(t)
+  }
+  return tasks
+}
+const configtasks = getConfigTasks()
+
+const getConfigWallets = () => {
+  const workbook = getXLSX().Sheets
+  const config_wallets = XLSX.utils.sheet_to_json(workbook.wallet)?.filter(row => !!row.address) || []
+  return config_wallets
+}
+const configwallets = getConfigWallets()
+
 const getValueFromTo = (from, to, digit = 0) => {
   from = Number(from)
   to = Number(to)
@@ -84,5 +125,8 @@ module.exports = {
   getAllWalletsData,
   extendJavaScript,
   getConfig,
-  getValueFromTo
+  getValueFromTo,
+  configconfig,
+  configtasks,
+  configwallets
 }
