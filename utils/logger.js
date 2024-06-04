@@ -1,10 +1,10 @@
-const { getTime } = require('./utils')
+const { get_time } = require('./utils')
 
 const TYPE = {
-  INFO: '\x1b[37m%s\x1b[0m',
+  INFO   : '\x1b[37m%s\x1b[0m',
   SUCCESS: '\x1b[32m%s\x1b[0m',
-  WARN: '\x1b[33m%s\x1b[0m',
-  ERROR: '\x1b[31m%s\x1b[0m'
+  WARN   : '\x1b[33m%s\x1b[0m',
+  ERROR  : '\x1b[31m%s\x1b[0m'
 }
 
 const info = message => {
@@ -33,7 +33,7 @@ const error = message => {
 
 const getHeaderDesc = () => {
   const stack = new Error().stack
-  const tips = getTime() + ' | ' + stack.split('\n')[3].trim() + '\r\n'
+  const tips = get_time() + ' | ' + stack.split('\n')[3].trim() + '\r\n'
   return tips
 }
 
