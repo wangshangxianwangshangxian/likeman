@@ -30,7 +30,6 @@ const show_table = () => {
   })
   logger.show_table_logger(headers, table_data)
 }
-const timer   = setInterval(show_table, 1000)
 
 const exec_tasks = async thread => {
   const { tasks } = thread.wallet
@@ -95,6 +94,7 @@ const exec_threads = async () => {
 }
 
 const start_exec = async () => {
+  const timer = setInterval(show_table, 1000)
   await exec_threads()
   clearInterval(timer)
   process.exit()
