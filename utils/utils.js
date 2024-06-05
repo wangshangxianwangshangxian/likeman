@@ -2,14 +2,15 @@ const path = require('path')
 const fs   = require('fs')
 const xlsx = require('xlsx')
 
-const get_time = (time_stamp = Date.now(), format = 'YYYY-MM-DD hh:mm:ss') => {
+const get_time = (time_stamp = Date.now(), format = 'YYYY-MM-DD hh:mm:ss.ms') => {
   const d       = new Date(time_stamp)
-  const year    = String(d.getFullYear()) .padStart(4, '0')
-  const month   = String(d.getMonth() + 1).padStart(2, '0')
-  const date    = String(d.getDate())     .padStart(2, '0')
-  const hours   = String(d.getHours())    .padStart(2, '0')
-  const minutes = String(d.getMinutes())  .padStart(2, '0')
-  const seconds = String(d.getSeconds())  .padStart(2, '0')
+  const year    = String(d.getFullYear())    .padStart(4, '0')
+  const month   = String(d.getMonth() + 1)   .padStart(2, '0')
+  const date    = String(d.getDate())        .padStart(2, '0')
+  const hours   = String(d.getHours())       .padStart(2, '0')
+  const minutes = String(d.getMinutes())     .padStart(2, '0')
+  const seconds = String(d.getSeconds())     .padStart(2, '0')
+  const millsec = String(d.getMilliseconds()).padEnd(3, '0')
 
   const date_str = format.replace('YYYY', year)
     .replace('MM', month)
@@ -17,6 +18,7 @@ const get_time = (time_stamp = Date.now(), format = 'YYYY-MM-DD hh:mm:ss') => {
     .replace('hh', hours)
     .replace('mm', minutes)
     .replace('ss', seconds)
+    .replace('ms', millsec)
   return date_str
 }
 
@@ -77,6 +79,8 @@ const create_version_folder = (version) => {
     fs.mkdirSync(version_path)
   }
   
+  const thread_file = join_path(`result/${version}/thread.txt`)
+  fs.writeFileSync(thread_file, '')
 }
 
 module.exports = {

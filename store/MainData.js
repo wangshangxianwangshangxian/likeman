@@ -1,7 +1,7 @@
-const { get_xlsx, get_time } = require("../utils/utils")
+const { get_xlsx, get_time, get_value_from_to } = require("../utils/utils")
 
 class MainData {
-
+	version = ''
 	wallets = [
 		// {
 		// 	address: '',
@@ -13,6 +13,7 @@ class MainData {
 		// 			dependencies: -1,
 		// 			start_time: '',
 		// 			end_time: '',
+		//      result: 'wait'
 		// 		}
 		// 	]
 		// }
@@ -32,6 +33,10 @@ class MainData {
 
 	constructor() {
 		console.log('main data init')
+	}
+
+	init_version(version) {
+		this.version = version
 	}
 
 	init_wallets() {
@@ -91,34 +96,51 @@ class MainData {
     })
 	}
 
-	pending_thread(thread, address, delay) {
-		const target  = this.threads.find(t => t.thread === thread)
-		const wallet  = this.wallets.find(w => w.address === address)
-		target.status = `pending ${delay}s`
-		target.wallet = wallet
+	pending_thread(thread, address) {
+		const target    = this.threads.find(t => t.thread === thread)
+		const wallet    = this.wallets.find(w => w.address === address)
+		target.status   = `pending`
+		target.wallet   = wallet
+		const delay     = get_value_from_to(this.configs.thread_sleep_from, this.configs.thread_sleep_to, 2)
+		const delay_d   = new Date(Date.now() + delay * 1000)
+		target.deadline = get_time(delay_d)
 	}
 
 	work_thread(thread) {
-		const target  = this.threads.find(t => t.thread === thread)
-		target.status = 'work'
+		const target    = this.threads.find(t => t.thread === thread)
+		target.status   = 'work'
+		target.deadline = ''
+	}
+	
+	sleep_thread(thread) {
+		const target    = this.threads.find(t => t.thread === thread)
+		target.status   = 'sleep'
+		const delay     = get_value_from_to(this.configs.task_sleep_from, this.configs.task_sleep_to, 2)
+		const delay_d   = new Date(Date.now() + delay * 1000)
+		target.deadline = get_time(delay_d)
+		return delay
 	}
 	
 	wait_thread(thread) {
-		const target  = this.threads.find(t => t.thread === thread)
-		target.status = 'wait'
-		target.wallet = null
+		const target    = this.threads.find(t => t.thread === thread)
+		target.status   = 'wait'
+		target.wallet   = null
+		target.deadline = ''
 	}
 
-	set_task_starttime(address, id) {
-		const wallet    = this.wallets.find(w => w.address === address)
-		const task      = wallet.tasks.find(t => t.id === id)
-		task.start_time = get_time()
+	end_thread(thread) {
+		const target    = this.threads.find(t => t.thread === thread)
+		target.status   = 'end'
+		target.wallet   = null
+		target.deadline = ''
 	}
 
-	set_task_endtime(address, id) {
-		const wallet  = this.wallets.find(w => w.address === address)
-		const task    = wallet.tasks.find(t => t.id === id)
-		task.end_time = get_time()
+	set_task_info(address, id, info = {}) {
+		const wallet = this.wallets.find(w => w.address === address)
+		const task   = wallet.tasks.find(t => t.id === id)
+		for (let key in info) {
+			task[key] = info[key]
+		}
 	}
 
   static _instance

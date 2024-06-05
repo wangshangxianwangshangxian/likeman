@@ -4,7 +4,8 @@ module.exports = async wallet => {
     message: null,
     data   : null
   }
-  await new Promise(succ => setTimeout(succ, 1000))
+  const delay = Math.ceil(Math.random() * 10) * 1000
+  await new Promise(succ => setTimeout(succ, delay))
 
   return resp
 }

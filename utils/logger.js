@@ -1,4 +1,6 @@
-const { get_time } = require('./utils')
+const MainData = require('../store/MainData')
+const { get_time, join_path } = require('./utils')
+const fs = require('fs')
 
 const TYPE = {
   INFO   : '\x1b[37m%s\x1b[0m',
@@ -10,25 +12,33 @@ const TYPE = {
 const info = message => {
   const header_desc = get_header_desc()
   const footer_desc = get_footer_desc()
-  console.log(TYPE.INFO, header_desc + message + footer_desc)
+  const str         = header_desc + message + footer_desc
+  console.log(TYPE.INFO, str)
+  return str
 }
 
 const success = message => {
   const header_desc = get_header_desc()
   const footer_desc = get_footer_desc()
-  console.log(TYPE.SUCCESS, header_desc + message + footer_desc)
+  const str         = header_desc + message + footer_desc
+  console.log(TYPE.SUCCESS, str)
+  return str
 }
 
 const warn = message => {
   const header_desc = get_header_desc()
   const footer_desc = get_footer_desc()
-  console.log(TYPE.WARN, header_desc + message + footer_desc)
+  const str         = header_desc + message + footer_desc
+  console.log(TYPE.WARN, str)
+  return str
 }
 
 const error = message => {
   const header_desc = get_header_desc()
   const footer_desc = get_footer_desc()
-  console.log(TYPE.ERROR, header_desc + message + footer_desc)
+  const str         = header_desc + message + footer_desc
+  console.log(TYPE.ERROR, str)
+  return str
 }
 
 const show_table_logger = (headers = [], table_data = [], type) => {
@@ -36,8 +46,13 @@ const show_table_logger = (headers = [], table_data = [], type) => {
   const gap = 2
   const gap_str = '  '
   headers.forEach(field => {
-    const len = table_data.reduce((max, row) => row[field].length > max ? row[field].length : max, field.length)
-    headers_length.push(len)
+    try {
+      const len = table_data.reduce((max, row) => row[field].length > max ? row[field].length : max, field.length)
+      headers_length.push(len)
+    }
+    catch (e) {
+      debugger
+    }
   })
 
   let str  = ''
@@ -52,8 +67,13 @@ const show_table_logger = (headers = [], table_data = [], type) => {
     })
     str += '\n'
   })
-  success(str)
+  const message = success(str)
+  const file = join_path(`result/${MainData.Ins().version}/thread.txt`)
+  save_log(file, message + '\n')
+}
 
+const save_log = (file, str) => {
+  fs.writeFileSync(file, str, { flag: 'a+' })
 }
 
 const get_header_desc = () => {
@@ -71,5 +91,6 @@ module.exports = {
   success,
   warn,
   error,
-  show_table_logger
+  show_table_logger,
+  save_log
 }
