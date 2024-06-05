@@ -31,13 +31,16 @@ const exec_tasks = async thread => {
   const { tasks } = thread.wallet
   for (let i = 0; i < tasks.length; i++) {
     const task = tasks[i]
+    MainData.Ins().set_task_starttime(thread.wallet.address, task.id)
     try {
       const result = await task_list[task.func](thread.wallet)
     }
     // 发生异常，执行下一个任务
     catch(e) {
+      MainData.Ins().set_task_endtime(thread.wallet.address, task.id)
       continue
     }
+    MainData.Ins().set_task_endtime(thread.wallet.address, task.id)
   }
   const delay = Math.ceil(Math.random() * 5)
   await new Promise(resolve => setTimeout(resolve, delay * 1000))

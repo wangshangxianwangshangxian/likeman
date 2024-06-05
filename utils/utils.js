@@ -1,3 +1,5 @@
+const path = require('path')
+const fs   = require('fs')
 const xlsx = require('xlsx')
 
 const get_time = (time_stamp = Date.now(), format = 'YYYY-MM-DD hh:mm:ss') => {
@@ -69,11 +71,20 @@ const get_value_from_to = (from, to, decimal = 0) => {
   return Number(num_str)
 }
 
+const create_version_folder = (version) => {
+  const version_path = join_path(`result/${version}`)
+  if (!fs.existsSync(version_path)) {
+    fs.mkdirSync(version_path)
+  }
+  
+}
+
 module.exports = {
   get_time,
   get_root,
   join_path,
   get_xlsx,
   excute_javascript,
-  get_value_from_to
+  get_value_from_to,
+  create_version_folder
 }

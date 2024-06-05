@@ -1,4 +1,4 @@
-const { get_xlsx } = require("../utils/utils")
+const { get_xlsx, get_time } = require("../utils/utils")
 
 class MainData {
 
@@ -107,6 +107,18 @@ class MainData {
 		const target  = this.threads.find(t => t.thread === thread)
 		target.status = 'wait'
 		target.wallet = null
+	}
+
+	set_task_starttime(address, id) {
+		const wallet    = this.wallets.find(w => w.address === address)
+		const task      = wallet.tasks.find(t => t.id === id)
+		task.start_time = get_time()
+	}
+
+	set_task_endtime(address, id) {
+		const wallet  = this.wallets.find(w => w.address === address)
+		const task    = wallet.tasks.find(t => t.id === id)
+		task.end_time = get_time()
 	}
 
   static _instance
