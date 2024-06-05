@@ -11,6 +11,7 @@ const task_list = {
   demo: demo
 }
 
+// 打印线程信息
 const show_table = () => {
   const threads = MainData.Ins().threads
   const headers = ['thread', 'status', 'address']
@@ -27,6 +28,17 @@ const show_table = () => {
 
 const exec_tasks = async thread => {
   MainData.Ins().work_thread(thread.thread)
+  const { tasks } = thread.wallet
+  for (let i = 0; i < tasks.length; i++) {
+    const task = tasks[i]
+    try {
+      const result = await task_list[task.func](thread.wallet)
+    }
+    // 发生异常，执行下一个任务
+    catch(e) {
+      continue
+    }
+  }
   const delay = Math.ceil(Math.random() * 5)
   await new Promise(resolve => setTimeout(resolve, delay * 1000))
   MainData.Ins().wait_thread(thread.thread)
