@@ -1,6 +1,6 @@
 const MainData = require("../store/MainData")
 const logger = require("../utils/logger")
-const { excute_javascript, get_time, save_log } = require("../utils/utils")
+const { excute_javascript, get_time } = require("../utils/utils")
 const test = require("./test")
 const demo = require("./demo")
 

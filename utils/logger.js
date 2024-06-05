@@ -9,32 +9,32 @@ const TYPE = {
   ERROR  : '\x1b[31m%s\x1b[0m'
 }
 
-const info = message => {
-  const header_desc = get_header_desc()
+const info = (message, index) => {
+  const header_desc = get_header_desc(index)
   const footer_desc = get_footer_desc()
   const str         = header_desc + message + footer_desc
   console.log(TYPE.INFO, str)
   return str
 }
 
-const success = message => {
-  const header_desc = get_header_desc()
+const success = (message, index) => {
+  const header_desc = get_header_desc(index)
   const footer_desc = get_footer_desc()
   const str         = header_desc + message + footer_desc
   console.log(TYPE.SUCCESS, str)
   return str
 }
 
-const warn = message => {
-  const header_desc = get_header_desc()
+const warn = (message, index) => {
+  const header_desc = get_header_desc(index)
   const footer_desc = get_footer_desc()
   const str         = header_desc + message + footer_desc
   console.log(TYPE.WARN, str)
   return str
 }
 
-const error = message => {
-  const header_desc = get_header_desc()
+const error = (message, index) => {
+  const header_desc = get_header_desc(index)
   const footer_desc = get_footer_desc()
   const str         = header_desc + message + footer_desc
   console.log(TYPE.ERROR, str)
@@ -67,7 +67,7 @@ const show_table_logger = (headers = [], table_data = [], type) => {
     })
     str += '\n'
   })
-  const message = success(str)
+  const message = success(str, 4)
   const file = join_path(`result/${MainData.Ins().version}/thread.txt`)
   save_log(file, message + '\n')
 }
@@ -76,9 +76,12 @@ const save_log = (file, str) => {
   fs.writeFileSync(file, str, { flag: 'a+' })
 }
 
-const get_header_desc = () => {
-  const stack = new Error().stack
-  const tips = get_time() + ' | ' + stack.split('\n')[3].trim() + '\r\n'
+const get_header_desc = (index = 3) => {
+  const stack   = new Error().stack
+  const message = stack.split('\n')[index]
+  const start_f = message.indexOf('(') + 1
+  const end_f   = message.lastIndexOf(')')
+  const tips    = get_time() + '  ' + message.slice(start_f, end_f) + '\r\n'
   return tips
 }
 

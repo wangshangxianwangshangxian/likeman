@@ -8,4 +8,4 @@ dist
 config/config.ini
 dist.zip
 main.exe
-result
+result/*
