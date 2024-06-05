@@ -40,9 +40,40 @@ const get_xlsx = () => {
  return info
 }
 
+const excute_javascript = () => {
+  Array.prototype.__current_index = -1
+
+  Array.prototype.get_current_index = function () {
+    return this.__current_index
+  }
+  
+  Array.prototype.get_next = function (loop = false) {
+    this.__current_index++
+    if (this.__current_index >= this.length) {
+      if (loop) {
+        this.__current_index = 0
+      }
+      else {
+        this.__current_index = this.length
+        return null
+      }
+    }
+
+    return this[this.__current_index]
+  }
+}
+
+const get_value_from_to = (from, to, decimal = 0) => {
+  let r = Math.random() * (to - from) + from
+  const num_str = r.toFixed(decimal)
+  return Number(num_str)
+}
+
 module.exports = {
   get_time,
   get_root,
   join_path,
-  get_xlsx
+  get_xlsx,
+  excute_javascript,
+  get_value_from_to
 }

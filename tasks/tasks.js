@@ -1,87 +1,84 @@
-const { extendJavaScript, getValueFromTo, configconfig } = require("../utils/utils")
+const MainData = require("../store/MainData")
 const logger = require("../utils/logger")
-const signGenesisProof = require("./signGenesisProof")
+const { excute_javascript, get_value_from_to } = require("../utils/utils")
 const test = require("./test")
+const demo = require("./demo")
 
-extendJavaScript()
+excute_javascript()
 
-const fn_list = {
+const task_list = {
   test: test,
-  signGenesisProof: signGenesisProof
+  demo: demo
 }
 
-// Single wallet excutes all tasks
-const execTasks = (wallet, tasks) => {
-  return new Promise(async succ => {
-    const r = {
-      code: 0,
-      message: null,
-      data: []
+const show_table = () => {
+  const threads = MainData.Ins().threads
+  const headers = ['thread', 'status', 'address']
+  const table_data = threads.map(t => {
+    const info = {
+      thread: t.thread,
+      status: t.status,
+      address: t.wallet?.address || ''
     }
-
-    const config = configconfig
-    for (let i = 0; i < tasks.length; i++) {
-      const task = tasks[i]
-      const result = await fn_list[task.fn](wallet, ...task.params)
-      r.data.push(result)
-
-      if (i < task.length - 1) {
-        const delay = getValueFromTo(config.task_sleep_from, config.task_sleep_to)
-        logger.warn(`${wallet.address} ready to excutes next task, delay ${delay}s`)
-        await new Promise(resolve => setTimeout(resolve, delay * 1000))
-      }
-    }
-
-    logger.info(`${wallet.address} all tasks have excuted!`)
-
-    succ(r)
+    return info
   })
+  logger.show_table_logger(headers, table_data)
 }
 
-// Total wallets excute tasks
-const execWallets = (wallets, tasks) => {
+const exec_tasks = async thread => {
+  MainData.Ins().work_thread(thread.thread)
+  const delay = Math.ceil(Math.random() * 5)
+  await new Promise(resolve => setTimeout(resolve, delay * 1000))
+  MainData.Ins().wait_thread(thread.thread)
+}
+
+const exec_threads = async () => {
   return new Promise(async succ => {
-    const r = {
-      code: 0,
+    const resp = {
+      code   : 0,
       message: null,
-      data: []
+      data   : null
     }
 
-    let wallet = wallets.getNext()
-    let curr_thread = 0
-    let last_thread_start_time = Date.now()
-    const config = configconfig
-    while (wallet) {
-      if (curr_thread >= configconfig.thread) {
+    const { thread_sleep_from, thread_sleep_to } = MainData.Ins().configs
+    const threads = MainData.Ins().threads
+    const timer   = setInterval(show_table, 1000)
+    const wallets = MainData.Ins().wallets
+    while(1) {
+      const t = threads.find(t => t.status === 'wait')
+      if (!t) {
         await new Promise(resolve => setTimeout(resolve, 10))
         continue
       }
 
-      curr_thread++
-      new Promise(async resolve => {
-        const result = await execTasks(wallet, tasks)
-        curr_thread--
-        resolve(result)
-      })
-
-      wallet = wallets.getNext()
-      if (!wallet) {
-        break
+      const wallet = wallets.get_next()
+      if (wallet) {
+        const delay = get_value_from_to(thread_sleep_from, thread_sleep_to, 2)
+        MainData.Ins().pending_thread(t.thread, wallet.address, delay)
+        await new Promise(resolve => setTimeout(resolve, delay * 1000))
+        exec_tasks(t)
+        continue
       }
 
-      const delay = getValueFromTo(config.thread_sleep_from, config.thread_sleep_to)
-      logger.warn(`${wallet.address} the next wallet start excute after ${delay}s`)
-      await new Promise(resolve => setTimeout(resolve, delay * 1000))
-    }
-
-    while(curr_thread > 0) {
+      // 有空闲线程，但没有未执行钱包了，说明当前还有钱包在线程中，如果全部线程为wait，则为执行完毕
+      const flag = threads.every(t => t.status === 'wait')
+      if (flag) {
+        show_table()
+        clearInterval(timer)
+        break
+      }
       await new Promise(resolve => setTimeout(resolve, 10))
     }
 
-    succ(r)
+    succ(resp)
   })
 }
 
+const start_exec = async () => {
+  await exec_threads()
+  process.exit()
+}
+
 module.exports = {
-  execWallets
+  start_exec
 }
