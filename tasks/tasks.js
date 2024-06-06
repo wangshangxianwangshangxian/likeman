@@ -1,6 +1,6 @@
 const MainData = require("../store/MainData")
 const logger = require("../utils/logger")
-const { excute_javascript, get_time } = require("../utils/utils")
+const { excute_javascript, get_time, show_table_str } = require("../utils/utils")
 const test = require("./test")
 const demo = require("./demo")
 
@@ -28,7 +28,22 @@ const show_table = () => {
     }
     return info
   })
-  logger.show_table_logger(headers, table_data)
+
+  const str = show_table_str(headers, table_data)
+  logger.success(str)
+  logger.save_thread_log(str)
+}
+
+const show_wallet_table = (thread, task) => {
+  const headers    = ['task', 'status', 'start_time', 'end_time']
+  const table_data = [{
+    task      : task.id,
+    status    : task.status,
+    start_time: task.start_time,
+    end_time  : task.end_time,
+  }]
+  const str = show_table_str(headers, table_data)
+  logger.save_wallet_log(thread.wallet, str)
 }
 
 const exec_tasks = async thread => {
@@ -37,6 +52,8 @@ const exec_tasks = async thread => {
     const task = tasks[i]
     MainData.Ins().work_thread(thread.thread)
     MainData.Ins().set_task_info(thread.wallet.address, task.id, { start_time: get_time(), status: 'work' })
+    show_table()
+    show_wallet_table(thread, task)
     try {
       const result = await task_list[task.func](thread.wallet)
     }
@@ -44,10 +61,13 @@ const exec_tasks = async thread => {
       // do something
     }
     MainData.Ins().set_task_info(thread.wallet.address, task.id, { end_time: get_time(), status: 'success' })
+    show_wallet_table(thread, task)
     const delay = MainData.Ins().sleep_thread(thread.thread)
+    show_table()
     await new Promise(succ => setTimeout(succ, delay * 1000))
   }
   MainData.Ins().wait_thread(thread.thread)
+  show_table()
 }
 
 const exec_threads = async () => {
@@ -64,6 +84,7 @@ const exec_threads = async () => {
     while(1) {
       // 所有线程都停工，则视为所有账号结束
       if (threads.every(t => t.status === 'end')) {
+        show_table()
         break
       }
 
@@ -72,10 +93,12 @@ const exec_threads = async () => {
           const wallet = wallets.get_next()
           if (!wallet) {
             MainData.Ins().end_thread(t.thread)
+            show_table()
             return
           }
 
           MainData.Ins().pending_thread(t.thread, wallet.address)
+          show_table()
         }
         else if (t.status === 'pending') {
           const d = new Date(t.deadline)
@@ -94,9 +117,9 @@ const exec_threads = async () => {
 }
 
 const start_exec = async () => {
-  const timer = setInterval(show_table, 1000)
+  // const timer = setInterval(show_table, 1000)
   await exec_threads()
-  clearInterval(timer)
+  // clearInterval(timer)
   process.exit()
 }
 

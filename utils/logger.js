@@ -41,39 +41,16 @@ const error = (message, index) => {
   return str
 }
 
-const show_table_logger = (headers = [], table_data = [], type) => {
-  const headers_length = []
-  const gap = 2
-  const gap_str = '  '
-  headers.forEach(field => {
-    try {
-      const len = table_data.reduce((max, row) => row[field].length > max ? row[field].length : max, field.length)
-      headers_length.push(len)
-    }
-    catch (e) {
-      debugger
-    }
-  })
-
-  let str  = ''
-      str += headers   .map((h, index) => h  .padEnd(headers_length[index], ' ')).join(' '.padEnd(gap, ' ')) + '\n' // header
-      str += headers   .map((h, index) => '-'.padEnd(headers_length[index], '-')).join('-'.padEnd(gap, '-')) + '\n' // split line
-  
-  // table content
-  table_data.forEach(row => {
-    headers.forEach((field, index) => {
-      const col_width = headers_length[index]
-      str += String(row[field]).padEnd(col_width, ' ') + gap_str
-    })
-    str += '\n'
-  })
-  const message = success(str, 4)
-  const file = join_path(`result/${MainData.Ins().version}/thread.txt`)
-  save_log(file, message + '\n')
+const save_thread_log = (str, index = 3) => {
+  const message = get_header_desc(index) + str + get_footer_desc()
+  const file    = join_path(`result/${MainData.Ins().version}/thread.txt`)
+  fs.writeFileSync(file, message, { flag: 'a+' })
 }
 
-const save_log = (file, str) => {
-  fs.writeFileSync(file, str, { flag: 'a+' })
+const save_wallet_log = (wallet, str = '') => {
+  const file    = join_path(`result/${MainData.Ins().version}/wallet/${wallet.address}.txt`)
+  const message = get_header_desc(3) + str + get_footer_desc()
+  fs.writeFileSync(file, message, { flag: 'a+' })
 }
 
 const get_header_desc = (index = 3) => {
@@ -94,6 +71,7 @@ module.exports = {
   success,
   warn,
   error,
-  show_table_logger,
-  save_log
+  save_thread_log,
+  get_header_desc,
+  save_wallet_log
 }

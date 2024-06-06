@@ -74,13 +74,45 @@ const get_value_from_to = (from, to, decimal = 0) => {
 }
 
 const create_version_folder = (version) => {
-  const version_path = join_path(`result/${version}`)
-  if (!fs.existsSync(version_path)) {
-    fs.mkdirSync(version_path)
+  const version_folder = join_path(`result/${version}`)
+  if (!fs.existsSync(version_folder)) {
+    fs.mkdirSync(version_folder)
   }
+
+  const wallet_folder = join_path(`result/${version}/wallet`)
+  if (!fs.existsSync(wallet_folder)) {
+    fs.mkdirSync(wallet_folder)
+  }
+}
+
+const show_table_str = (headers = [], table_data = []) => {
+  const headers_length = []
+  const gap = 2
+  const gap_str = '  '
+  headers.forEach(field => {
+    try {
+      const len = table_data.reduce((max, row) => row[field].length > max ? row[field].length : max, field.length)
+      headers_length.push(len)
+    }
+    catch (e) {
+      debugger
+    }
+  })
+
+  let str  = ''
+      str += headers   .map((h, index) => h  .padEnd(headers_length[index], ' ')).join(' '.padEnd(gap, ' ')) + '\n' // header
+      str += headers   .map((h, index) => '-'.padEnd(headers_length[index], '-')).join('-'.padEnd(gap, '-')) + '\n' // split line
   
-  const thread_file = join_path(`result/${version}/thread.txt`)
-  fs.writeFileSync(thread_file, '')
+  // table content
+  table_data.forEach(row => {
+    headers.forEach((field, index) => {
+      const col_width = headers_length[index]
+      str += String(row[field]).padEnd(col_width, ' ') + gap_str
+    })
+    str += '\n'
+  })
+
+  return str
 }
 
 module.exports = {
@@ -90,5 +122,6 @@ module.exports = {
   get_xlsx,
   excute_javascript,
   get_value_from_to,
-  create_version_folder
+  create_version_folder,
+  show_table_str
 }

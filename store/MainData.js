@@ -29,7 +29,13 @@ class MainData {
 	}
 
 	tasks = []
-	threads = []
+	threads = [
+		// {
+		// 	thread: '',
+		// 	status: 'wait',
+		// 	wallet: null
+		// }
+	]
 
 	constructor() {
 		console.log('main data init')
