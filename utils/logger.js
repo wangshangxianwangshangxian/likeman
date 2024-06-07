@@ -9,7 +9,7 @@ const TYPE = {
   ERROR  : '\x1b[31m%s\x1b[0m'
 }
 
-const info = (message, index) => {
+const info = (message, index = 3) => {
   const header_desc = get_header_desc(index)
   const footer_desc = get_footer_desc()
   const str         = header_desc + message + footer_desc
@@ -17,7 +17,7 @@ const info = (message, index) => {
   return str
 }
 
-const success = (message, index) => {
+const success = (message, index = 3) => {
   const header_desc = get_header_desc(index)
   const footer_desc = get_footer_desc()
   const str         = header_desc + message + footer_desc
@@ -25,7 +25,7 @@ const success = (message, index) => {
   return str
 }
 
-const warn = (message, index) => {
+const warn = (message, index = 3) => {
   const header_desc = get_header_desc(index)
   const footer_desc = get_footer_desc()
   const str         = header_desc + message + footer_desc
@@ -33,8 +33,8 @@ const warn = (message, index) => {
   return str
 }
 
-const error = (message, index) => {
-  const header_desc = get_header_desc(index)
+const error = (message, index = 3, stack) => {
+  const header_desc = get_header_desc(index, stack)
   const footer_desc = get_footer_desc()
   const str         = header_desc + message + footer_desc
   console.log(TYPE.ERROR, str)
@@ -47,14 +47,14 @@ const save_thread_log = (str, index = 3) => {
   fs.writeFileSync(file, message, { flag: 'a+' })
 }
 
-const save_wallet_log = (wallet, str = '') => {
+const save_wallet_log = (wallet, str = '', index = 3, statck) => {
   const file    = join_path(`result/${MainData.Ins().version}/wallet/${wallet.address}.txt`)
-  const message = get_header_desc(3) + str + get_footer_desc()
+  const message = get_header_desc(index, statck) + str + get_footer_desc()
   fs.writeFileSync(file, message, { flag: 'a+' })
 }
 
-const get_header_desc = (index = 3) => {
-  const stack   = new Error().stack
+const get_header_desc = (index = 3, _stack) => {
+  const stack   = _stack || new Error().stack
   const message = stack.split('\n')[index]
   const start_f = message.indexOf('(') + 1
   const end_f   = message.lastIndexOf(')')

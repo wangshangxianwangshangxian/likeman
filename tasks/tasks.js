@@ -3,12 +3,14 @@ const logger = require("../utils/logger")
 const { excute_javascript, get_time, show_table_str } = require("../utils/utils")
 const test = require("./test")
 const demo = require("./demo")
+const ens = require("./ens")
 
 excute_javascript()
 
 const task_list = {
   test: test,
-  demo: demo
+  demo: demo,
+  ens: ens
 }
 
 // 打印线程信息
@@ -23,7 +25,7 @@ const show_table = () => {
       address : t.wallet?.address || '',
       current : t.wallet?.tasks.find(t => t.status === 'work')?.id || '',
       success : t.wallet?.tasks.filter(t => t.status === 'success').length || '0',
-      fail    : t.wallet?.tasks.filter(t => t.status === 'end').length || '0',
+      fail    : t.wallet?.tasks.filter(t => t.status === 'fail').length || '0',
       total   : t.wallet?.tasks.length || ''
     }
     return info
@@ -56,11 +58,13 @@ const exec_tasks = async thread => {
     show_wallet_table(thread, task)
     try {
       const result = await task_list[task.func](thread.wallet)
+      MainData.Ins().set_task_info(thread.wallet.address, task.id, { end_time: get_time(), status: 'success' })
     }
     catch(e) {
-      // do something
+      logger.error(e.message + '\n', 1, e.stack)
+      logger.save_wallet_log(thread.wallet, e.message + '\n', 1, e.stack)
+      MainData.Ins().set_task_info(thread.wallet.address, task.id, { end_time: get_time(), status: 'fail' })
     }
-    MainData.Ins().set_task_info(thread.wallet.address, task.id, { end_time: get_time(), status: 'success' })
     show_wallet_table(thread, task)
     const delay = MainData.Ins().sleep_thread(thread.thread)
     show_table()
