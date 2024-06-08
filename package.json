@@ -1,10 +1,12 @@
 {
-  "name": "likeman.git",
+  "name": "likeman",
   "version": "1.0.0",
-  "description": "",
+  "description": "just a soft",
   "main": "main.js",
+  "bin": "./main.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "pkg . --targets node18-macos-arm64 --debug"
   },
   "repository": {
     "type": "git",
