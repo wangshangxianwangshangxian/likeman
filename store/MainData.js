@@ -20,12 +20,16 @@ class MainData {
 	]
 
 	configs = {
-		thread           : 1,
-		thread_sleep_from: 1,
-		thread_sleep_to  : 1,
-		task_sleep_from  : 1,
-		task_sleep_to    : 1,
-		mode             : 1
+		thread           						 : 1,
+		thread_sleep_from						 : 1,
+		thread_sleep_to  						 : 1,
+		task_sleep_from  						 : 1,
+		task_sleep_to    						 : 1,
+		mode             						 : 1,
+		max_priority_fee_per_gas_from: 0,
+		max_priority_fee_per_gas_to  : 0,
+		max_fee_per_gas_from 				 : 50,
+		max_fee_per_gas_to				   : 100
 	}
 
 	tasks = []
