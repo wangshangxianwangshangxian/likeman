@@ -58,10 +58,16 @@ const exec_tasks = async thread => {
     show_wallet_table(thread, task)
     try {
       const result = await task_list[task.func](thread.wallet)
-      MainData.Ins().set_task_info(thread.wallet.address, task.id, { end_time: get_time(), status: 'success' })
+      let status = 'success'
+      if (result.code !== 0) {
+        logger.error(result.message)
+        status = 'fail'
+      }
+      MainData.Ins().set_task_info(thread.wallet.address, task.id, { end_time: get_time(), status })
+      logger.save_wallet_log(thread.wallet, JSON.stringify(result) + '\n')
     }
     catch(e) {
-      logger.error(e.message + '\n', 1, e.stack)
+      console.error(e)
       logger.save_wallet_log(thread.wallet, e.message + '\n', 1, e.stack)
       MainData.Ins().set_task_info(thread.wallet.address, task.id, { end_time: get_time(), status: 'fail' })
     }
