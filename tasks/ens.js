@@ -4,7 +4,7 @@ const crypto   = require('crypto')
 const MainData = require("../store/MainData")
 const { get_value_from_to } = require('../utils/utils')
 
-module.exports = async wallet => {
+module.exports = async (wallet, { chain }) => {
   const resp = {
     code   : 0,
     message: null,
@@ -12,7 +12,7 @@ module.exports = async wallet => {
   }
 
   const configs           = MainData.Ins().configs
-  const web3              = new Web3('https://eth.llamarpc.com')
+  const web3              = new Web3(chain)
   const contract_address  = '0x253553366Da8546fC250F225fe3d25d0C782303b'
   const contract          = new web3.eth.Contract(abi, contract_address)
   const account           = wallet.address

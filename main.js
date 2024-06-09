@@ -10,6 +10,7 @@ const main = async () => {
   MainData.Ins().init_version(version)
   MainData.Ins().init_wallets()
   MainData.Ins().init_configs()
+  MainData.Ins().init_chain_list()
   MainData.Ins().init_tasks()
   MainData.Ins().init_threads()
 

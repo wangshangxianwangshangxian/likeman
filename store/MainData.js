@@ -1,4 +1,4 @@
-const { get_xlsx, get_time, get_value_from_to } = require("../utils/utils")
+const { get_xlsx, get_time, get_value_from_to, join_path } = require("../utils/utils")
 
 class MainData {
 	version = ''
@@ -8,12 +8,14 @@ class MainData {
 		// 	private_key: '',
 		// 	tasks: [
 		// 		{
-		// 			id: -1,
-		// 			func: '',
+		// 			id          : -1,
+		// 			func        : '',
 		// 			dependencies: -1,
-		// 			start_time: '',
-		// 			end_time: '',
-		//      result: 'wait'
+		// 			start_time  : '',
+		// 			end_time    : '',
+		//      result      : 'wait',
+		//		  network     : '',
+		//			chain		    : ''
 		// 		}
 		// 	]
 		// }
@@ -40,6 +42,9 @@ class MainData {
 		// 	wallet: null
 		// }
 	]
+	chain_list = {
+		// 'Ethereum Mainnet': []
+	}
 
 	constructor() {
 		console.log('main data init')
@@ -85,9 +90,10 @@ class MainData {
 				const info = {
 					id          : Number(t.id),
 					func        : t.func,
-					dependencies: t.dependencies || null,
-					start_time  : '2024-06-05 12:58:23',
+					start_time  : '',
 					end_time    : '',
+					network     : t.network,
+					chain				: t.chain || this.get_chain_random(t.network)
 				}
 				w.tasks.push(info)
 			})
@@ -104,6 +110,24 @@ class MainData {
       }
       this.threads.push(info)
     })
+	}
+
+	init_chain_list() {
+		const xlsx   = get_xlsx()
+		const chains  = xlsx.chain
+
+		this.chain_list = {}
+		chains.forEach(row => {
+			const { network, chain } = row
+			this.chain_list[network] = this.chain_list[network] || []
+			this.chain_list[network].push(chain)
+		})
+	}
+
+	get_chain_random(network) {
+		const arrs = this.chain_list[network] || []
+		const r    = Math.floor(Math.random() * arrs.length)
+		return arrs[r]
 	}
 
 	pending_thread(thread, address) {
