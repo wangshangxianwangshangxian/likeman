@@ -15,15 +15,16 @@ effective gas 指的是平均gas费用，它由两部分组成：基础费用和
 
 ### task
 
-### chain
-该表的`network`列和`chain`列的内容来源于[ChainList](https://chainlist.org/)
+### chain表
+该表的`network`列和`chain`列的内容来源于[ChainList](https://chainlist.org/)，
 可配置相同的`network`和`chain`，其最终会按照`network`列分类成一个映射，假设表格内容如下：
 | network          | chain                    |
 | ---------------- | ------------------------ |
 | Ethereum Mainnet | https://eth.llamarpc.com |
 | Ethereum Mainnet | https://eth.merkle.io	  |
 | Linea            | https://rpc.linea.build  |
-最终的映射会变成
+
+最终的映射会变成：
 ```
 const chain_list = {
   'Ethereum Mainnet': ['https://eth.llamarpc.com', 'https://eth.merkle.io'],
