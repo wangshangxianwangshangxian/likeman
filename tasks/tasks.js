@@ -1,16 +1,13 @@
 const MainData = require("../store/MainData")
 const logger = require("../utils/logger")
 const { excute_javascript, get_time, show_table_str } = require("../utils/utils")
-const test = require("./test")
-const demo = require("./demo")
-const ens = require("./ens")
-
 excute_javascript()
 
 const task_list = {
-  test: test,
-  demo: demo,
-  ens: ens
+  test             : require("./test"),
+  demo             : require("./demo"),
+  ens              : require("./ens"),
+  snapshot_delegate: require("./snapshot_delegate")
 }
 
 // 打印线程信息
