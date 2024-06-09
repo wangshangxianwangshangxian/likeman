@@ -6,7 +6,9 @@
   "bin": "./main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "pkg . --targets node18-macos-arm64 --debug"
+    "build": "pkg . --targets node18-macos-arm64 --debug",
+    "node": "npx hardhat node",
+    "query_balance": "node scripts/query_balance.js"
   },
   "repository": {
     "type": "git",
@@ -23,5 +25,9 @@
     "inquirer": "^8.2.0",
     "web3": "^4.9.0",
     "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "@nomiclabs/hardhat-web3": "^2.0.0",
+    "hardhat": "^2.22.5"
   }
 }

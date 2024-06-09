@@ -9,3 +9,4 @@ config/config.ini
 dist.zip
 main.exe
 result/*
+cache
