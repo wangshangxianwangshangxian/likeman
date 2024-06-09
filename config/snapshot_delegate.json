@@ -1,0 +1,16 @@
+{
+  "desc": "【委托投票】zoom 表示空间名称, delegate 表示在这个空间下可以委托的账号",
+  "url" : "https://snapshot.org/",
+  "list": [
+    {
+      "zoom": "balancer.eth",
+      "delegates": [
+        "0x7BF49814598924b1Ab2A33ad815054B6367CDDd0",
+        "0x9d5765595a92c560c8759d2a9c375C66123765a5",
+        "0xE7a2E3c4E89e454606409C40D6c63DC5e2AdDCbd",
+        "0x7334Da6b036E0793730DbAC73E78D0E109844Be5",
+        "0xff9aD25c19c34ddE2576D437BB5C6bE018b61493"
+      ]
+    }
+  ]
+}
