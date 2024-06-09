@@ -9,9 +9,10 @@ effective gas 指的是平均gas费用，它由两部分组成：基础费用和
 
 
 ## 🦌 wallext.xlsx
-### wallet
+### wallet表
+注意除了自己使用，不要随意暴露你的私钥！
 
-### config
+### config表
 excel表中的`desc`已详细说明，不再赘述，其中`mode`字段目前固定为1，因为其他模式还未实现。
 
 ### task表
