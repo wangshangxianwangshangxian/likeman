@@ -9,7 +9,7 @@ module.exports = async (wallet, { chain }) => {
     message: null,
     data   : null
   }
-
+  
   const web3              = new Web3(chain)
   const contract_address  = '0x253553366Da8546fC250F225fe3d25d0C782303b'
   const contract          = new web3.eth.Contract(abi, contract_address)

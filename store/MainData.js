@@ -1,5 +1,5 @@
 const { get_xlsx, get_time, get_value_from_to, join_path } = require("../utils/utils")
-const { ENV, TASK } = require("./constant")
+const { ENV, TASK, THREAD } = require("./constant")
 const fs = require('fs')
 
 class MainData {
@@ -113,7 +113,7 @@ class MainData {
 		new Array(this.configs.thread).fill(0).map((t, order) => {
       const info = {
         thread: order + 1,
-        status: 'wait',
+        status: THREAD.WAIT,
         wallet: null
       }
       this.threads.push(info)
@@ -150,7 +150,7 @@ class MainData {
 	pending_thread(thread, address) {
 		const target    = this.threads.find(t => t.thread === thread)
 		const wallet    = this.wallets.find(w => w.address === address)
-		target.status   = `pending`
+		target.status   = THREAD.PENDING
 		target.wallet   = wallet
 		const delay     = get_value_from_to(this.configs.thread_sleep_from, this.configs.thread_sleep_to, 2)
 		const delay_d   = new Date(Date.now() + delay * 1000)
@@ -159,13 +159,13 @@ class MainData {
 
 	work_thread(thread) {
 		const target    = this.threads.find(t => t.thread === thread)
-		target.status   = 'work'
+		target.status   = THREAD.WORK
 		target.deadline = ''
 	}
 	
 	sleep_thread(thread) {
 		const target    = this.threads.find(t => t.thread === thread)
-		target.status   = 'sleep'
+		target.status   = THREAD.SLEEP
 		const delay     = get_value_from_to(this.configs.task_sleep_from, this.configs.task_sleep_to, 2)
 		const delay_d   = new Date(Date.now() + delay * 1000)
 		target.deadline = get_time(delay_d)
@@ -181,7 +181,7 @@ class MainData {
 
 	end_thread(thread) {
 		const target    = this.threads.find(t => t.thread === thread)
-		target.status   = 'end'
+		target.status   = THREAD.END
 		target.wallet   = null
 		target.deadline = ''
 	}

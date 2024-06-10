@@ -11,9 +11,11 @@ const TASK = {
 }
 
 const THREAD = {
-  WORK : 'work',
-  SLEEP: 'sleep',
-  WAIT : 'wait'
+  WORK   : 'work',
+  PENDING: 'pending',
+  SLEEP  : 'sleep',
+  WAIT   : 'wait',
+  END    : 'end'
 }
 
 module.exports = {

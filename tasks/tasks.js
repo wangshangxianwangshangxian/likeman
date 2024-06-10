@@ -14,24 +14,21 @@ const task_list = {
 
 // 打印线程信息
 const show_table = () => {
-  const threads = MainData.Ins().threads
-  const headers = ['thread', 'status', 'deadline', 'address', 'current', 'success', 'fail', 'total']
-  const table_data = threads.map(t => {
+  const wallets = MainData.Ins().wallets
+  const headers = ['address', 'current_task_id', 'success', 'fail', 'total']
+  const table_data = wallets.map(w => {
     const info = {
-      thread  : t.thread,
-      status  : t.status,
-      deadline: t.deadline,
-      address : t.wallet?.address || '',
-      current : t.wallet?.tasks.find(t => t.status === 'work')?.id || '',
-      success : t.wallet?.tasks.filter(t => t.status === 'success').length || '0',
-      fail    : t.wallet?.tasks.filter(t => t.status === 'fail').length || '0',
-      total   : t.wallet?.tasks.length || ''
+      address         : w.address || '',
+      current_task_id : w.tasks.find(t => t.status === TASK.WORK)?.id || 'null',
+      success         : w.tasks.filter(t => t.status === TASK.SUCCESS).length || '0',
+      fail            : w.tasks.filter(t => t.status === TASK.FAIL).length || '0',
+      total           : w.tasks.length || ''
     }
     return info
   })
 
   const str = show_table_str(headers, table_data)
-  logger.success(str)
+  logger.info(str)
   logger.save_thread_log(str)
 }
 
@@ -53,8 +50,7 @@ const exec_tasks = async thread => {
       MainData.Ins().set_task_info(thread.wallet.address, task.id, { end_time: get_time(), status })
     }
     catch(e) {
-      console.error(e)
-      MainData.Ins().set_task_info(thread.wallet.address, task.id, { end_time: get_time(), status: TASK.FAIL, message: e })
+      MainData.Ins().set_task_info(thread.wallet.address, task.id, { end_time: get_time(), status: TASK.FAIL, message: e.stack })
 
     }
     const delay = MainData.Ins().sleep_thread(thread.thread)
