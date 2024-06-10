@@ -200,19 +200,19 @@ class MainData {
 		const account     = wallet.address
 		const private_key = wallet.private_key
 	
-		const estimate_gas = Number(await web3.eth.estimateGas({ from: account, to, data: abi_data }))
-		const base_gas     = Number(await web3.eth.getGasPrice())
-		const priority_gas = Number(web3.utils.toWei(get_value_from_to(configs.max_priority_fee_per_gas_from, configs.max_priority_fee_per_gas_to), 'gwei'))
-		const max_eff_gas  = Number(web3.utils.toWei(get_value_from_to(configs.max_fee_per_gas_from, configs.max_fee_per_gas_to), 'gwei'))
-		const effect_gas   = Number(base_gas) + Number(priority_gas)
+		const estimate_gas = await web3.eth.estimateGas({ from: account, to, data: abi_data })
+		const base_gas     = await web3.eth.getGasPrice()
+		const priority_gas = web3.utils.toBigInt(web3.utils.toWei(get_value_from_to(configs.max_priority_fee_per_gas_from, configs.max_priority_fee_per_gas_to), 'gwei'))
+		const max_eff_gas  = web3.utils.toBigInt(web3.utils.toWei(get_value_from_to(configs.max_fee_per_gas_from, configs.max_fee_per_gas_to), 'gwei'))
+		const effect_gas   = base_gas + priority_gas
 		
 		if (effect_gas > max_eff_gas) {
 			throw new Error(`基础gas ${base_gas} + 小费gas ${priority_gas} > 最大gas ${max_eff_gas}`)
 		}
 		
-		const balance   = Number(await web3.eth.getBalance(account))
-		const total_gas = Number(estimate_gas) * Number(effect_gas)
-		if (total_gas > Number(balance)) {
+		const balance   = web3.utils.toBigInt(await web3.eth.getBalance(account))
+		const total_gas = estimate_gas * effect_gas
+		if (total_gas > balance) {
 			throw new Error(`余额不足以支付gas费, 余额 ${balance}, gas费 ${total_gas}`)
 		}
 		
@@ -227,7 +227,7 @@ class MainData {
 		const signed_tx = await web3.eth.accounts.signTransaction(transaction, private_key)
 		const receipt   = await web3.eth.sendSignedTransaction(signed_tx.rawTransaction)
 		
-		if (receipt.status !== 1) {
+		if (web3.utils.toNumber(receipt.status) !== 1) {
 			throw new Error(receipt.message)
 		}
 	}

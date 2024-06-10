@@ -67,12 +67,15 @@ const excute_javascript = () => {
   }
 }
 
-const get_value_from_to = (from, to, decimal = 0) => {
+// 一般是给 web3.utils.toWei 方法作为入参，它优先接收字符串，如果传number，仍然会转成字符串，会有精度丢失问题。
+const get_value_from_to = (from, to, decimal = 0, return_num = false) => {
   from          = Number(from)
   to            = Number(to)
   let r         = Math.random() * (to - from) + from
   const num_str = r.toFixed(decimal)
-  return Number(num_str)
+  if (return_num)
+    return Number(num_str)
+  return num_str
 }
 
 const create_version_folder = (version) => {
