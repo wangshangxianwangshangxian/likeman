@@ -28,7 +28,7 @@ const show_table = () => {
   })
 
   const str = show_table_str(headers, table_data)
-  logger.info(str)
+  logger.success(str)
   logger.save_thread_log(str)
 }
 
@@ -41,17 +41,11 @@ const exec_tasks = async thread => {
     show_table()
     try {
       const chain = MainData.Ins().is_prod ? task.chain : MainData.Ins().localhost
-      const result = await task_list[task.func](thread.wallet, { chain })
-      let status = TASK.SUCCESS
-      if (result.code !== 0) {
-        logger.error(result.message)
-        status = TASK.FAIL
-      }
-      MainData.Ins().set_task_info(thread.wallet.address, task.id, { end_time: get_time(), status })
+      await task_list[task.func](thread.wallet, { chain })
+      MainData.Ins().set_task_info(thread.wallet.address, task.id, { end_time: get_time(), status: TASK.SUCCESS })
     }
     catch(e) {
       MainData.Ins().set_task_info(thread.wallet.address, task.id, { end_time: get_time(), status: TASK.FAIL, message: e.stack })
-
     }
     const delay = MainData.Ins().sleep_thread(thread.thread)
     show_table()

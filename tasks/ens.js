@@ -4,15 +4,8 @@ const crypto   = require('crypto')
 const MainData = require("../store/MainData")
 
 module.exports = async (wallet, { chain }) => {
-  const resp = {
-    code   : 0,
-    message: null,
-    data   : null
-  }
-  
   const web3              = new Web3(chain)
   const contract_address  = '0x253553366Da8546fC250F225fe3d25d0C782303b'
-  const contract          = new web3.eth.Contract(abi, contract_address)
   
   const name           = 'tao-wa.eth'
   const owner          = wallet.address
@@ -22,10 +15,9 @@ module.exports = async (wallet, { chain }) => {
   const data           = []
   const reverse_record = false
   const fuses          = 0
+  const contract       = new web3.eth.Contract(abi, contract_address)
+  const commitment     = await contract.methods.makeCommitment(name, owner, duration, secret, resolver, data, reverse_record, fuses).call()
+  const abi_data       = contract.methods.commit(commitment).encodeABI()
 
-  const commitment   = await contract.methods.makeCommitment(name, owner, duration, secret, resolver, data, reverse_record, fuses).call()
-  const abi_data     = contract.methods.commit(commitment).encodeABI()
-
-  const result = await MainData.Ins().send_signed_transaction(wallet, contract_address, abi_data, web3)
-  return resp
+  await MainData.Ins().send_signed_transaction(wallet, contract_address, abi_data, web3)
 }

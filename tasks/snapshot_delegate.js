@@ -11,12 +11,6 @@ const get_delegate_info = () => {
 }
 
 module.exports = async (wallet, { chain }) => {
-  const resp = {
-    code   : 0,
-    message: null,
-    data   : null
-  }
-
   const web3              = new Web3(chain)
   const contract_address  = '0x469788fE6E9E9681C6ebF3bF78e7Fd26Fc015446'
   
@@ -26,6 +20,5 @@ module.exports = async (wallet, { chain }) => {
   const delegate_address = delegate.slice(2).padStart(64, '0')
   const abi_data         = func + zoom_id + delegate_address
 
-  const result = await MainData.Ins().send_signed_transaction(wallet, contract_address, abi_data, web3)
-  return resp
+  await MainData.Ins().send_signed_transaction(wallet, contract_address, abi_data, web3)
 }

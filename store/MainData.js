@@ -195,13 +195,7 @@ class MainData {
 		this.save_task_log(wallet, task.id)
 	}
 
-	send_signed_transaction = async (wallet, to, abi_data, web3) => {
-		const resp = {
-			code   : 0,
-			message: null,
-			data   : null
-		}
-	
+	send_signed_transaction = async (wallet, to, abi_data, web3) => {	
 		const configs     = this.configs
 		const account     = wallet.address
 		const private_key = wallet.private_key
@@ -213,19 +207,13 @@ class MainData {
 		const effect_gas   = Number(base_gas) + Number(priority_gas)
 		
 		if (effect_gas > max_eff_gas) {
-			resp.code    = 1
-			resp.message = '基础gas + 小费gas > 最大gas'
-			resp.data    = { base_gas, priority_gas, max_eff_gas }
-			return resp
+			throw new Error(`基础gas ${base_gas} + 小费gas ${priority_gas} > 最大gas ${max_eff_gas}`)
 		}
 		
 		const balance   = Number(await web3.eth.getBalance(account))
 		const total_gas = Number(estimate_gas) * Number(effect_gas)
 		if (total_gas > Number(balance)) {
-			resp.code    = 2
-			resp.message = '余额不足以支付 gas费'
-			resp.data    = { total_gas, balance }
-			return resp
+			throw new Error(`余额不足以支付gas费, 余额 ${balance}, gas费 ${total_gas}`)
 		}
 		
 		const transaction = {
@@ -238,13 +226,10 @@ class MainData {
 		}
 		const signed_tx = await web3.eth.accounts.signTransaction(transaction, private_key)
 		const receipt   = await web3.eth.sendSignedTransaction(signed_tx.rawTransaction)
-	
-		if (Number(receipt.status) !== 1) {
-			resp.code    = 3
-			resp.message = 'web3.eth.sendSignedTransaction 请求结果不成功'
+		
+		if (receipt.status !== 1) {
+			throw new Error(receipt.message)
 		}
-		resp.data = receipt
-		return resp
 	}
 
 	get_task (address, task_id) {

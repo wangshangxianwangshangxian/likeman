@@ -8,7 +8,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "pkg . --targets node18-macos-arm64 --debug",
     "node": "npx hardhat node",
-    "query_balance": "node scripts/query_balance.js"
+    "query_balance": "node scripts/query_balance.js",
+    "start": "node ./main.js"
   },
   "repository": {
     "type": "git",

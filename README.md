@@ -55,7 +55,7 @@ excel表中的`desc`已详细说明，不再赘述，其中`mode`字段目前固
 | Linea            | https://rpc.linea.build  |
 
 最终的映射会变成：
-```
+```javascript
 const chain_list = {
   'Ethereum Mainnet': ['https://eth.llamarpc.com', 'https://eth.merkle.io'],
   'Linea'           : ['https://rpc.linea.build']
@@ -63,4 +63,18 @@ const chain_list = {
 ```
 
 ## 🧑‍🌾 聊点项目思想
-1. 输出日志这个行为，基本上是在某个通用方法内执行的，如`MainData.Ins().set_task_info`会输出任务相关的日志。这样做的好处是使得数据发生变更时更容易被追踪，因为数据的修改都是通过调用方法来实现的，决不允许出现直接修改数据的情况，所以统一在通用方法中输出日志。
+### 输出日志
+输出日志这个行为，基本上是在某个通用方法内执行的，如`MainData.Ins().set_task_info`会输出任务相关的日志。这样做的好处是使得数据发生变更时更容易被追踪，因为数据的修改都是通过调用方法来实现的，决不允许出现直接修改数据的情况，所以统一在通用方法中输出日志。
+### 异常处理
+在主要的 task 执行阶段，没有使用以往的`response`对象风格(下方代码)来追踪执行结果, 而是直接跑出`error`异常。我的想法是，在脚本执行期间，你可能不会理会一时的错误，只想把整个任务都进行下去---所以只要不能按预期执行的任务，都先记录下来，直接下一个。
+```javascript
+// response对象风格
+const resp = {
+  code   : 0,
+  message: null,
+  data   : null
+}
+
+// 抛出异常，接着执行下一个任务
+throw new Error('something error...')
+```

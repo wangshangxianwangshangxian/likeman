@@ -11,22 +11,14 @@ const get_token_address_random = () => {
 }
 
 module.exports = async (wallet, { chain }) => {
-  const resp = {
-    code   : 0,
-    message: null,
-    data   : null
-  }
-
-  const web3              = new Web3(chain)
-  const contract_address  = get_token_address_random()
-  const contract          = new web3.eth.Contract(abi, contract_address)
+  const web3             = new Web3(chain)
+  const contract_address = get_token_address_random()
   
-  const spender = wallet.address
-  const _value  = get_value_from_to(task_config.value_from, task_config.value_to, 9)
-  const value   = web3.utils.toWei(_value, 'ether')
-
-  const abi_data     = contract.methods.approve(spender, value).encodeABI()
+  const spender  = wallet.address
+  const _value   = get_value_from_to(task_config.value_from, task_config.value_to, 9)
+  const value    = web3.utils.toWei(_value, 'ether')
+  const contract = new web3.eth.Contract(abi, contract_address)
+  const abi_data = contract.methods.approve(spender, value).encodeABI()
   
-  const result = await MainData.Ins().send_signed_transaction(wallet, contract_address, abi_data, web3)
-  return resp
+  await MainData.Ins().send_signed_transaction(wallet, contract_address, abi_data, web3)
 }
