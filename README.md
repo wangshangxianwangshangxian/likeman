@@ -21,7 +21,7 @@ npm run node
 然后，在`main.js`文件中修改这一行代码，这里主要是控制当前要连接的链是本地测试还是外部环境。
 ```
 MainData.Ins().init_env({ env: ENV.PROD }) // 原来的
-MainData.Ins().init_env({ env: ENV.DEV })  // 原来的
+MainData.Ins().init_env({ env: ENV.DEV  }) // 修改成这样
 ```
 你可以使用命令行来执行脚本，但这不能更好的调试
 ```
