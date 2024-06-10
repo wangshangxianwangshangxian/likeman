@@ -55,7 +55,8 @@ const exec_tasks = async thread => {
     show_table()
     show_wallet_table(thread, task)
     try {
-      const result = await task_list[task.func](thread.wallet, { chain: task.chain})
+      const chain = MainData.Ins().is_prod ? task.chain : MainData.Ins().localhost
+      const result = await task_list[task.func](thread.wallet, { chain })
       let status = 'success'
       if (result.code !== 0) {
         logger.error(result.message)

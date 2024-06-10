@@ -1,4 +1,5 @@
 const MainData = require('./store/MainData')
+const { ENV } = require('./store/constant')
 const { start_exec } = require('./tasks/tasks')
 const { create_version_folder, get_time } = require('./utils/utils')
 
@@ -7,6 +8,7 @@ const main = async () => {
   create_version_folder(version)
 
   MainData.Ins()
+  MainData.Ins().init_env({ env: ENV.DEV })
   MainData.Ins().init_version(version)
   MainData.Ins().init_wallets()
   MainData.Ins().init_configs()

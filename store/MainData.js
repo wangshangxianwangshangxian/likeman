@@ -1,7 +1,10 @@
-const { get_xlsx, get_time, get_value_from_to, join_path } = require("../utils/utils")
+const { get_xlsx, get_time, get_value_from_to } = require("../utils/utils")
+const { ENV } = require("./constant")
 
 class MainData {
 	version = ''
+	env       = 'dev'
+	localhost = 'http://localhost:8545'
 	wallets = [
 		// {
 		// 	address: '',
@@ -124,6 +127,15 @@ class MainData {
 		})
 	}
 
+	init_env(config = {}) {
+		this.env 			 = config.env || this.env
+		this.localhost = config.localhost || this.localhost
+	}
+
+	get is_prod() {
+		return this.env === ENV.PROD
+	}
+
 	get_chain_random(network) {
 		const arrs = this.chain_list[network] || []
 		const r    = Math.floor(Math.random() * arrs.length)
@@ -175,6 +187,58 @@ class MainData {
 		for (let key in info) {
 			task[key] = info[key]
 		}
+	}
+
+	send_signed_transaction = async (wallet, to, abi_data, web3) => {
+		const resp = {
+			code   : 0,
+			message: null,
+			data   : null
+		}
+	
+		const configs     = this.configs
+		const account     = wallet.address
+		const private_key = wallet.private_key
+	
+		const estimate_gas = Number(await web3.eth.estimateGas({ from: account, to, data: abi_data }))
+		const base_gas     = Number(await web3.eth.getGasPrice())
+		const priority_gas = Number(web3.utils.toWei(get_value_from_to(configs.max_priority_fee_per_gas_from, configs.max_priority_fee_per_gas_to), 'gwei'))
+		const max_eff_gas  = Number(web3.utils.toWei(get_value_from_to(configs.max_fee_per_gas_from, configs.max_fee_per_gas_to), 'gwei'))
+		const effect_gas   = Number(base_gas) + Number(priority_gas)
+		
+		if (effect_gas > max_eff_gas) {
+			resp.code    = 1
+			resp.message = '基础gas + 小费gas > 最大gas'
+			resp.data    = { base_gas, priority_gas, max_eff_gas }
+			return resp
+		}
+		
+		const balance   = Number(await web3.eth.getBalance(account))
+		const total_gas = Number(estimate_gas) * Number(effect_gas)
+		if (total_gas > Number(balance)) {
+			resp.code    = 2
+			resp.message = '余额不足以支付 gas费'
+			resp.data    = { total_gas, balance }
+			return resp
+		}
+		
+		const transaction = {
+			from                : account,
+			to                  : to,
+			data                : abi_data,
+			gas                 : web3.utils.toHex(estimate_gas),
+			maxPriorityFeePerGas: web3.utils.toHex(priority_gas),
+			maxFeePerGas        : web3.utils.toHex(max_eff_gas),
+		}
+		const signed_tx = await web3.eth.accounts.signTransaction(transaction, private_key)
+		const receipt   = await web3.eth.sendSignedTransaction(signed_tx.rawTransaction)
+	
+		if (Number(receipt.status) !== 1) {
+			resp.code    = 3
+			resp.message = 'web3.eth.sendSignedTransaction 请求结果不成功'
+		}
+		resp.data = receipt
+		return resp
 	}
 
   static _instance
