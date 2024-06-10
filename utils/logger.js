@@ -47,12 +47,6 @@ const save_thread_log = (str, index = 3) => {
   fs.writeFileSync(file, message, { flag: 'a+' })
 }
 
-const save_wallet_log = (wallet, str = '', index = 3, statck) => {
-  const file    = join_path(`result/${MainData.Ins().version}/wallet/${wallet.address}.txt`)
-  const message = get_header_desc(index, statck) + str + get_footer_desc()
-  fs.writeFileSync(file, message, { flag: 'a+' })
-}
-
 const get_header_desc = (index = 3, _stack) => {
   const stack   = _stack || new Error().stack
   const message = stack.split('\n')[index]
@@ -72,6 +66,5 @@ module.exports = {
   warn,
   error,
   save_thread_log,
-  get_header_desc,
-  save_wallet_log
+  get_header_desc
 }

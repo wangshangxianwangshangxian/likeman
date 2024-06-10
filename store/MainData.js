@@ -1,5 +1,6 @@
-const { get_xlsx, get_time, get_value_from_to } = require("../utils/utils")
-const { ENV } = require("./constant")
+const { get_xlsx, get_time, get_value_from_to, join_path } = require("../utils/utils")
+const { ENV, TASK } = require("./constant")
+const fs = require('fs')
 
 class MainData {
 	version = ''
@@ -16,7 +17,8 @@ class MainData {
 		// 			dependencies: -1,
 		// 			start_time  : '',
 		// 			end_time    : '',
-		//      result      : 'wait',
+		//      status      : 'wait',
+		//      message     : '',
 		//		  network     : '',
 		//			chain		    : ''
 		// 		}
@@ -92,11 +94,14 @@ class MainData {
 			this.tasks.forEach(t => {
 				const info = {
 					id          : Number(t.id),
+					desc				: t.desc,
 					func        : t.func,
 					start_time  : '',
 					end_time    : '',
 					network     : t.network,
-					chain				: t.chain || this.get_chain_random(t.network)
+					chain				: t.chain || this.get_chain_random(t.network),
+					status      : TASK.WAIT,
+					message     : ''
 				}
 				w.tasks.push(info)
 			})
@@ -181,12 +186,13 @@ class MainData {
 		target.deadline = ''
 	}
 
-	set_task_info(address, id, info = {}) {
+	set_task_info(address, task_id, info = {}) {
 		const wallet = this.wallets.find(w => w.address === address)
-		const task   = wallet.tasks.find(t => t.id === id)
+		const task   = this.get_task(address, task_id)
 		for (let key in info) {
 			task[key] = info[key]
 		}
+		this.save_task_log(wallet, task.id)
 	}
 
 	send_signed_transaction = async (wallet, to, abi_data, web3) => {
@@ -239,6 +245,30 @@ class MainData {
 		}
 		resp.data = receipt
 		return resp
+	}
+
+	get_task (address, task_id) {
+		const wallet = this.wallets.find(w => w.address === address)
+		const tasks  = wallet.tasks || []
+		const task   = tasks.find(t => t.id === task_id)
+		return task
+	}
+
+	// 应该写到 logger 模块的，但会出现循环引用，后续优化。
+	save_task_log = (wallet, task_id, str = '') => {
+		const time    = get_time()
+		const task    = this.get_task(wallet.address, task_id)
+		const message = [
+											time,
+											task.status.padEnd(7, ' '),
+											task.desc,
+											task.message ? `\n${task.message}\n` : '',
+											str,
+											'\n'
+										].join('  ')
+		
+		const file    = join_path(`result/${this.version}/wallet/${wallet.address}.txt`)
+		fs.writeFileSync(file, message, { flag: 'a+' })
 	}
 
   static _instance
