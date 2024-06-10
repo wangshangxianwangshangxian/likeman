@@ -7,7 +7,8 @@ const task_list = {
   test             : require("./test"),
   demo             : require("./demo"),
   ens              : require("./ens"),
-  snapshot_delegate: require("./snapshot_delegate")
+  snapshot_delegate: require("./snapshot_delegate"),
+  approve          : require("./approve")
 }
 
 // 打印线程信息

@@ -1,0 +1,17 @@
+{
+  "desc": "【代币ERC-20授权】授权以太坊各种代币 ~ 授权给自己",
+  "url" : "https://etherscan.io/tokens",
+
+  "desc2": "tokens 表示 token 的合约地址",
+  "tokens": [
+    "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+    "0xB8c77482e45F1F44dE1745F52C74426C631bDD52",
+    "0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84",
+    "0x628F76eAB0C1298F7a24d337bBbF1ef8A1Ea6A24",
+    "0x582d872A1B094FC48F5DE31D3B73F2D9bE47def1"
+  ],
+
+  "desc3": "value 单位为 ETH, 示例为 0.0001 ETH - 10 ETH",
+  "value_from": 0.0001,
+  "value_to": 10
+}
