@@ -68,7 +68,9 @@ const excute_javascript = () => {
 }
 
 const get_value_from_to = (from, to, decimal = 0) => {
-  let r = Math.random() * (to - from) + from
+  from          = Number(from)
+  to            = Number(to)
+  let r         = Math.random() * (to - from) + from
   const num_str = r.toFixed(decimal)
   return Number(num_str)
 }
