@@ -18,8 +18,14 @@ const THREAD = {
   END    : 'end'
 }
 
+const TASK_MODE = {
+  ORDER : 1,
+  RANDOM: 2
+}
+
 module.exports = {
   ENV,
   TASK,
-  THREAD
+  THREAD,
+  TASK_MODE
 }

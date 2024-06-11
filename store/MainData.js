@@ -1,11 +1,11 @@
-const { get_xlsx, get_time, get_value_from_to, join_path } = require("../utils/utils")
-const { ENV, TASK, THREAD } = require("./constant")
+const { get_xlsx, get_time, get_value_from_to, join_path, shuffle_array } = require("../utils/utils")
+const { ENV, TASK, THREAD, TASK_MODE } = require("./constant")
 const fs = require('fs')
 
 class MainData {
 	version = ''
 	env       = 'dev'
-	localhost = 'http://localhost:8545'
+	localhost = 'http://127.0.0.1:8545'
 	wallets = [
 		// {
 		// 	address: '',
@@ -86,10 +86,6 @@ class MainData {
 		const tasks  = xlsx.task.filter(t => Number(t.exec) === 1)
 		this.tasks   = tasks
 		
-		// 随机执行
-		if (this.configs.mode === 2) {
-		}
-		
 		this.wallets.forEach(w => {
 			this.tasks.forEach(t => {
 				const info = {
@@ -106,6 +102,15 @@ class MainData {
 				w.tasks.push(info)
 			})
 		})
+
+		// 随机执行
+		if (this.configs.mode === TASK_MODE.RANDOM) {
+			this.wallets.forEach(w => {
+				shuffle_array(w.tasks)
+				const temp = w.tasks.map(t => t.id)
+				console.log(temp)
+			})
+		}
 	}
 
 	init_threads() {

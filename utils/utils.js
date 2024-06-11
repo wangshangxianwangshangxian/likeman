@@ -1,6 +1,6 @@
-const path = require('path')
-const fs   = require('fs')
-const xlsx = require('xlsx')
+const fs        = require('fs')
+const xlsx      = require('xlsx')
+const str_width = require('string-width')
 
 const get_time = (time_stamp = Date.now(), format = 'YYYY-MM-DD hh:mm:ss.ms') => {
   const d       = new Date(time_stamp)
@@ -120,6 +120,15 @@ const show_table_str = (headers = [], table_data = []) => {
   return str
 }
 
+// 洗牌算法
+const shuffle_array = arrs => {
+  for (let i = arrs.length - 1; i > 0; i--) {
+    const r = Math.floor(Math.random() * (i + 1));
+    [arrs[i], arrs[r]] = [arrs[r], arrs[i]]
+}
+  return arrs
+}
+
 module.exports = {
   get_time,
   get_root,
@@ -128,5 +137,6 @@ module.exports = {
   excute_javascript,
   get_value_from_to,
   create_version_folder,
-  show_table_str
+  show_table_str,
+  shuffle_array
 }
